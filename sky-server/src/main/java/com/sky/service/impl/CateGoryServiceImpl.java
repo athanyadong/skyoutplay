@@ -42,8 +42,8 @@ public class CateGoryServiceImpl implements CateGoryService {
         BeanUtils.copyProperties(categoryDTO,category);
 
         //设置修改时间、修改人
-        category.setUpdateTime(LocalDateTime.now());
-        category.setUpdateUser(BaseContext.getCurrentId());
+//        category.setUpdateTime(LocalDateTime.now());
+//        category.setUpdateUser(BaseContext.getCurrentId());
 
         cateGoryMapper.updateCate(category);
     }
@@ -75,8 +75,8 @@ public class CateGoryServiceImpl implements CateGoryService {
     @Override
     public void insertCate(CategoryDTO categoryDTO) {
         Category build = Category.builder()
-                .createUser(BaseContext.getCurrentId())
-                .createTime(LocalDateTime.now())
+//                .createUser(BaseContext.getCurrentId())
+//                .createTime(LocalDateTime.now())
                 .name(categoryDTO.getName())
                 .sort(categoryDTO.getSort())
                 .type(categoryDTO.getType())
