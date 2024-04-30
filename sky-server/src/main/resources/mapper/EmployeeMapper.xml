@@ -7,6 +7,7 @@
 <select id="getByUsername" resultType="Employee" >
     select * from employee where username = #{username}
 </select>
+
     <!-- int addDept(Dept dept);
   useGeneratedKeys="true" 返回数据库帮我们生成的主键
   keyProperty="deptno" 生成的主键值用我们对象那个属性存储
@@ -16,7 +17,15 @@
             values
             (#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{createTime},#{updateTime},#{createUser},#{updateUser},#{status})
     </insert>
-    
-    
-    
+<!--    like 模糊查询-->
+    <select id="pageQuery" resultType="com.sky.entity.Employee">
+        select * from employee
+        <where>
+            <if  test="name!=null and name!=''">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+        order by create_time desc
+
+    </select>
 </mapper>
