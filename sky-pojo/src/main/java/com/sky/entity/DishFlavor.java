@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor//无参构造器
 @AllArgsConstructor
 public class DishFlavor implements Serializable {
 

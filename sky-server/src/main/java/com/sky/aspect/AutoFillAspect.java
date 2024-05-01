@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 /**
  * 自定义切面累  实现公共字段自动填充处理逻辑
  */
-@Aspect
-@Component
+@Aspect//标识为切面类
+@Component//交给spring管理
 @Slf4j
 public class AutoFillAspect {
 

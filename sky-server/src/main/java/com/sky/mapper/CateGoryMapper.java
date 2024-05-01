@@ -31,7 +31,6 @@ public interface CateGoryMapper {
      * @param build
      */
     @AutoFill(value = OperationType.INSERT)
-
     void insertCate(Category build);
 
     void deleteCateById(Long id) ;

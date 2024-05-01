@@ -6,3 +6,9 @@ sky:
     database: sky_take_out
     username: root
     password: hanyadong
+
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com #地域节点
+    access-key-id: LTAI5tBNbaa6644Yu2k8Cr3J
+    access-key-secret: VU8octqzqiwhNdd0F8s9eJmUvtVuTF
+    bucket-name: sky-take-out20240501
