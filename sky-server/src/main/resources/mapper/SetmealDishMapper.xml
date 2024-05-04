@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealDishMapper">
-<!--    &#45;&#45;                                             目的是要拼成-->
+    <!--    &#45;&#45;                                             目的是要拼成-->
 <!--    &#45;&#45;         select setmeal_id from setmeal_dish where dish_id in (1,2,3,4,5,6)-->
 
     <select id="getSetmealIdsByDishIDs" resultType="java.lang.Long">
@@ -14,4 +14,22 @@
                 </foreach>
 
     </select>
+    <insert id="insertBatch" parameterType="list">
+        insert into setmeal_dish
+        (setmeal_id,dish_id,name,price,copies)
+        values
+        <foreach collection="setmealDishes" item="sd" separator=",">
+            (#{sd.setmealId},#{sd.dishId},#{sd.name},#{sd.price},#{sd.copies})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByIds" parameterType="list" >
+        delete from setmeal_dish
+            where id in
+        <foreach collection="list" item="sd" separator="," open="(" close=")">
+           #{sd}
+        </foreach>
+    </delete>
+
+
 </mapper>

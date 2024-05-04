@@ -28,7 +28,7 @@
 
 
     </update>
-<!--    莲表查询，查询dish表和category表，有id键进行连接，，，查询两个表并且模糊查询-->
+    <!--    莲表查询，查询dish表和category表，有id键进行连接，，，查询两个表并且模糊查询-->
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
         SELECT d.*,c.name as categoryName  FROM dish d left outer join category c on d.category_id = c.id
         <where>
@@ -44,4 +44,48 @@
         </where>
             order by d.create_time desc
     </select>
+
+        <select id="list" resultType="Dish" parameterType="Dish">
+            select * from dish
+            <where>
+                <if test="name != null">
+                    and name like concat('%',#{name},'%')
+                </if>
+                <if test="categoryId != null">
+                    and category_id = #{categoryId}
+                </if>
+                <if test="status != null">
+                    and status = #{status}
+                </if>
+            </where>
+            order by create_time desc
+
+    </select>
+
+    <delete id="deleteByIds">
+        delete from dish where id in
+                         <foreach collection="ids" separator="," item="id" open="(" close=")">
+                             #{id}
+                         </foreach>
+
+    </delete>
+
+    <update id="update">
+        update dish
+        <set>
+            <if test="name !=null ">name=#{name},</if>
+            <if test="categoryId !=null ">category_id=#{categoryId},</if>
+            <if test="price !=null ">price=#{price},</if>
+            <if test="image !=null ">image=#{image},</if>
+            <if test="description !=null ">description=#{description},</if>
+            <if test="status !=null ">status=#{status},</if>
+            <if test="updateTime !=null ">update_time=#{updateTime},</if>
+            <if test="updateUser !=null ">update_user=#{updateUser}</if>
+        </set>
+        where id= #{id}
+
+    </update>
+
+
+
 </mapper>
