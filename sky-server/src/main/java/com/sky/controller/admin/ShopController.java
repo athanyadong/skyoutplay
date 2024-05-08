@@ -20,9 +20,9 @@ public class ShopController {
 
 
 
-    @PutMapping("/#{status}")
+    @PutMapping("/{status}")
     @ApiOperation("店铺状态设置")
-    public Result setStatus(@PathVariable Integer status){
+    public Result setStatus(@PathVariable Long status){
         log.info("设置店铺状态位：{}",status==1?"营业中":"大洋了");
         redisTemplate.opsForValue().set("SHOP_STATUS",status);
         return Result.success();

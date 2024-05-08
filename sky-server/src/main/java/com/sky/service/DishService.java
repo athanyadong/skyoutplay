@@ -1,43 +1,71 @@
 package com.sky.service;
 
+import java.util.List;
+
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.vo.DishVO;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 public interface DishService {
-
     /**
-     * 添加菜品和口味数据
+     * 新增菜品以及保存口味
+     *
      * @param dishDTO
      */
-    void saveWith(DishDTO dishDTO);
-
-    PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO);
+    public void saveWithFlavor(DishDTO dishDTO);
 
     /**
-     * 批量删除功能
+     * 分页查询菜品
+     *
+     * @param dishPageQueryDTO
+     */
+    public PageResult queryPage(DishPageQueryDTO dishPageQueryDTO);
+
+    /**
+     * 删除菜品
+     *
      * @param ids
      */
-    void deleteBatch(List<Long> ids);
+    public void deleteBatch(List<Long> ids);
 
     /**
-     * 根据id查询对应的菜品和口味数据
+     * 根据id查询菜品
+     *
      * @param id
      * @return
      */
-    DishVO getByIdWithFlavor(Long id);
-
+    public DishVO getByIdWithFlavor(Long id);
 
     /**
-     * 根据id修改菜品基本信息和对应的口味信息
+     * 更新菜品以及口味
+     *
      * @param dishDTO
      */
-    void updateWithFlavor(DishDTO dishDTO);
+    public void updateWithFlavor(DishDTO dishDTO);
 
-    List<Dish> list(Long categoryId);
+    /**
+     * 启用或禁用菜品
+     *
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id);
+
+    /**
+     * 根据分类id查询菜品
+     *
+     * @param categoryId
+     * @return
+     */
+    public List<Dish> list(Long categoryId);
+
+    /**
+     * 条件查询菜品和口味
+     *
+     * @param dish
+     * @return
+     */
+    List<DishVO> listWithFlavor(Dish dish);
 }

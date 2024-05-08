@@ -33,7 +33,7 @@ public class DishController {
     @ApiOperation("新增菜品")
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品“：{}", dishDTO);
-        dishService.saveWith(dishDTO);
+        dishService.saveWithFlavor(dishDTO);
 
         return Result.success();
     }
@@ -47,7 +47,7 @@ public class DishController {
     @ApiOperation("菜品分页查询")
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
 
-        PageResult pageResult=dishService.pageQuery(dishPageQueryDTO);
+        PageResult pageResult=dishService.queryPage(dishPageQueryDTO);
         return Result.success(pageResult);
     }
 

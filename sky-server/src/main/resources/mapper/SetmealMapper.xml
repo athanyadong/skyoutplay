@@ -1,75 +1,71 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sky.mapper.SetmealMapper">
-    <delete id="deleteByIds" parameterType="list">
-        DELETE FROM setmeal
-        where id in
-        <foreach collection="list" item="as" separator="," open="(" close=")">
-            #{as}
-        </foreach>
-    </delete>
-<!--    &lt;!&ndash; 在Mapper XML中定义批量删除的操作 &ndash;&gt;-->
-<!--    <delete id="batchDelete" parameterType="list">-->
-<!--        DELETE FROM your_table-->
-<!--        WHERE id IN-->
-<!--        <foreach item="item" collection="list" open="(" separator="," close=")">-->
-<!--            #{item}-->
-<!--        </foreach>-->
-<!--    </delete>-->
+    <update id="update" parameterType="Setmeal">
+        update setmeal
+        <set>
+            <if test="name != null"> name = #{name}, </if>
+            <if test="categoryId != null"> category_id = #{categoryId}, </if>
+            <if test="price != null"> price = #{price}, </if>
+            <if test="status != null"> status = #{status}, </if>
+            <if test="description != null"> description = #{description}, </if>
+            <if test="image != null"> image = #{image}, </if>
+            <if test="updateTime != null"> update_time = #{updateTime}, </if>
+            <if test="updateUser != null"> update_user = #{updateUser} </if>
+        </set>
+        where id = #{id}
+    </update>
 
-    <select id="pageSelete" resultType="com.sky.vo.SetmealVO">
-
-        select a.*,c.name AS categoryName
-        from setmeal a left outer join category c on a.category_id = c.id
+    <select id="pageQuery">
+        select s.*,c.name categoryName
+        from setmeal s
+        left join category c
+        on s.category_id = c.id
         <where>
-            <if test="name !=null ">
-                and a.name like concat('%',#{name},'%')
+            <if test="name != null">
+                and s.name like concat('%',#{name},'%')
             </if>
-            <if test="status !=null ">
-                and a.status like concat('%',#{status},'%')
+            <if test="status != null">
+                and s.status = #{status}
             </if>
-            <if test="categoryId !=null ">
-                and a.category_id like concat('%',#{categoryId},'%')
+            <if test="categoryId != null">
+                and s.category_id = #{categoryId}
             </if>
-
         </where>
-        order by a.create_time desc
-
-<!--        SELECT d.*,c.name as categoryName  FROM dish d left outer join category c on d.category_id = c.id-->
-<!--        <where>-->
-<!--            <if test="name != null">-->
-<!--                and d.name like concat('%',#{name},'%')-->
-<!--            </if>-->
-<!--            <if test="categoryId != null">-->
-<!--                and d.categoryId = #{categoryId}-->
-<!--            </if>-->
-<!--            <if test="status != null">-->
-<!--                and d.status = #{status}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--            order by d.create_time desc-->
+        order by s.create_time desc
     </select>
 
     <insert id="insert" parameterType="Setmeal" useGeneratedKeys="true" keyProperty="id">
         insert into setmeal
         (category_id, name, price, status, description, image, create_time, update_time, create_user, update_user)
         values (#{categoryId}, #{name}, #{price}, #{status}, #{description}, #{image}, #{createTime}, #{updateTime},
-                #{createUser}, #{updateUser})
+        #{createUser}, #{updateUser})
     </insert>
 
-    <update id="update">
-    update setmeal
-    <set>
-        <if test="name !=null ">name=#{name},</if>
-        <if test="categoryId !=null ">category_id=#{categoryId},</if>
-        <if test="price !=null ">price=#{price},</if>
-        <if test="image !=null ">image=#{image},</if>
-        <if test="description !=null ">description=#{description},</if>
-        <if test="status !=null ">status=#{status},</if>
-        <if test="updateTime !=null ">update_time=#{updateTime},</if>
-        <if test="updateUser !=null ">update_user=#{updateUser}</if>
-    </set>
-    where id= #{id}
-    </update>
+    <select id="list" parameterType="Setmeal" resultType="Setmeal">
+        select * from setmeal
+        <where>
+            <if test="name != null">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from setmeal
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
 </mapper>
