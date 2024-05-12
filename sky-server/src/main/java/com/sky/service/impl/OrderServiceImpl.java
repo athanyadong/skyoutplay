@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
@@ -15,6 +16,7 @@ import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class OrderServiceImpl implements OrderService
-{
+public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderMapper orderMapper;
@@ -47,8 +49,14 @@ public class OrderServiceImpl implements OrderService
 
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+
+
+    @Autowired
+    private WebSocketServer webSocketServer;
+
     /**
      * 用户下单
+     *
      * @param ordersSubmitDTO
      * @return
      */
@@ -57,7 +65,7 @@ public class OrderServiceImpl implements OrderService
 
         //处理各种业务异常（地址簿为空。购物车数据为空
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
-        if (addressBook==null){
+        if (addressBook == null) {
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
 
@@ -67,14 +75,14 @@ public class OrderServiceImpl implements OrderService
         shoppingCart.setUserId(userId);
         List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
 
-        if (list==null || list.isEmpty()){
+        if (list == null || list.isEmpty()) {
             throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
         }
 
 
         //订单表插入一套数据
-        Orders orders=new Orders();
-        BeanUtils.copyProperties(ordersSubmitDTO,orders);
+        Orders orders = new Orders();
+        BeanUtils.copyProperties(ordersSubmitDTO, orders);
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayStatus(Orders.UN_PAID);
         orders.setStatus(Orders.PENDING_PAYMENT);
@@ -90,7 +98,7 @@ public class OrderServiceImpl implements OrderService
         for (ShoppingCart cart : list) {
             //把购物车里的数据复制到订单明细表中
             OrderDetail orderDetail = new OrderDetail();
-            BeanUtils.copyProperties(cart,orderDetail);
+            BeanUtils.copyProperties(cart, orderDetail);
             orderDetail.setOrderId(orders.getId());//设置当前的订单明细的订单id
             orderDetails.add(orderDetail);
         }
@@ -149,6 +157,7 @@ public class OrderServiceImpl implements OrderService
      */
     public void paySuccess(String outTradeNo) {
 
+
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
 
@@ -161,5 +170,35 @@ public class OrderServiceImpl implements OrderService
                 .build();
 
         orderMapper.update(orders);
+        //通过websocket向客户端发消息  type orderid  content
+        HashMap map = new HashMap<>();
+        map.put("type",1);//1标识来单提醒，2标识客户催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号"+outTradeNo);
+        String jsonString = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
+
+        //
+    }
+
+
+    public void reminder(Long id) {
+        //根据id查询数据库
+       Orders orderS =  orderMapper.getById(id);
+
+       //查看订单是否存在
+        if (orderS == null ){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        HashMap map = new HashMap<>();
+        map.put("type",2);//1标识来单提醒，2标识客户催单
+        map.put("orderId",orderS.getId());
+        map.put("content","订单号"+orderS.getNumber());
+        String jsonString = JSON.toJSONString(map);
+
+        //通过websocket向客户端推送数据
+        webSocketServer.sendToAllClient(jsonString);
+
     }
 }
